@@ -8,6 +8,7 @@ import java.io.Serializable;
 
 public class JiChatMsg implements Serializable {
 
+    private static final long serialVersionUID = 2L;
     public String type;
     public int sender;
     public int receiver;

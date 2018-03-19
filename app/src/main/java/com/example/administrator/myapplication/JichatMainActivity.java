@@ -18,8 +18,8 @@ public class JichatMainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         data.add(new Integer(111));
-        data.add(new Integer(222));
-        data.add(new Integer(333));
+        //data.add(new Integer(222));
+        //data.add(new Integer(333));
         setContentView(R.layout.activity_jichat_main);
         context = JichatMainActivity.this;
         lv = findViewById(R.id.lv_friend);

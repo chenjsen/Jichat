@@ -2,6 +2,7 @@ package com.example.administrator.myapplication;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -17,10 +18,12 @@ public class ClientConServerThread extends Thread {
 
     private Context context;
     private Socket s;
+    Handler handler;
     public Socket getS() {return s;}
-    public ClientConServerThread(Context context,Socket s){
+    public ClientConServerThread(Context context, Socket s, Handler handler){
         this.context=context;
         this.s=s;
+        this.handler = handler;
     }
 
     @Override
@@ -46,7 +49,7 @@ public class ClientConServerThread extends Thread {
                         Log.e("Jichat",temp);
                         JichatMainActivity.data.add(Integer.parseInt(temp));
                     }
-
+                    handler.sendEmptyMessage(0x123);
                     //Log.i("", "--"+s[0]);
                     //Log.i("", "--"+s[1]);
                 }
