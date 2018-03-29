@@ -3,6 +3,7 @@ package com.example.administrator.myapplication;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -28,6 +29,7 @@ public class ClientConServerThread extends Thread {
 
     @Override
     public void run() {
+        LocalBroadcastManager lbm = LocalBroadcastManager.getInstance(context);
         while(true){
             ObjectInputStream ois = null;
             JiChatMsg jcm;
@@ -37,11 +39,13 @@ public class ClientConServerThread extends Thread {
                 if(jcm.getType().equals(JiChatMsgType.COM_MES)
                         || jcm.getType().equals(JiChatMsgType.GROUP_MES)){//如果是聊天消息
                     //把从服务器获得的消息通过广播发送
-                    Intent intent = new Intent("org.yhn.yq.mes");
-                    String[] message=new String[]{};
-                    Log.i("--", message.toString());
+                    Intent intent = new Intent("com.example.administrator.mes");
+                    String[] message=new String[]{
+                            jcm.getSender()+"",
+                            jcm.getContent(),};
+                    Log.e("Jichat2", "44"+message.toString());
                     intent.putExtra("message", message);
-                    context.sendBroadcast(intent);
+                    lbm.sendBroadcast(intent);
                 }else if(jcm.getType().equals(JiChatMsgType.RET_ONLINE_FRIENDS)){//如果是好友列表
                     //更新好友，群
                     String s[] = jcm.getContent().split(" ");
@@ -53,9 +57,9 @@ public class ClientConServerThread extends Thread {
                     //Log.i("", "--"+s[0]);
                     //Log.i("", "--"+s[1]);
                 }
-                if(jcm.getType().equals(JiChatMsgType.SUCCESS)){
-                    Toast.makeText(context, "操作成功！", Toast.LENGTH_SHORT);
-                }
+//                if(jcm.getType().equals(JiChatMsgType.SUCCESS)){
+//                    Toast.makeText(context, "操作成功！", Toast.LENGTH_SHORT);
+//                }
             } catch (Exception e) {
                 //e.printStackTrace();
                 try {

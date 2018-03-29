@@ -11,15 +11,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.net.InetAddress;
 import java.net.Socket;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
@@ -91,51 +85,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private boolean login(String usrName,String passWord) throws IOException {
         boolean result = false;
 
-        //1.创建客户端Socket，指定服务器地址和端口
-        Socket socket = new Socket("192.168.3.19", 12345);
-        //2.获取输出流，向服务器端发送信息
-        //OutputStream os = socket.getOutputStream();//字节输出流
-        //InputStream is  = socket.getInputStream();
-        //PrintWriter pw = new PrintWriter(os);//将输出流包装为打印流
-        //BufferedReader br = new BufferedReader(new InputStreamReader(is,"UTF-8"));
-        //获取客户端的IP地址
-        //InetAddress address = InetAddress.getLocalHost();
-        //String ip = address.getHostAddress();
-        //pw.write("login " + ip + " " + usrName + " " + passWord);
-        //pw.flush();
-
-        //socket.shutdownOutput();//关闭输出流
-        //socket.close();
-        //String temp = br.readLine().toString();
-        //Log.e("Jichat","response from server :"+temp);
-        //if(temp.equals("0")){
-            //result = true;
-            //开启一条线程与服务器保持长连接
-            //创建一个该账号和服务器保持连接的线程
-            //ClientConServerThread ccst=new ClientConServerThread(MainActivity.this,socket);
-            //启动该通信线程
-            //ccst.start();
-            //加入到管理类中
-            //ManageClientConServer.addClientConServerThread(Integer.parseInt(usrName), ccst);
-
-            //ObjectOutputStream oos = new ObjectOutputStream (os);
-                    //ManageClientConServer.getClientConServerThread(Integer.parseInt(usrName)).getS().getOutputStream());
-            //JiChatMsg m=new JiChatMsg();
-            //m.setType(JiChatMsgType.GET_ONLINE_FRIENDS);
-            //m.setSender(Integer.parseInt(usrName));
-            //oos.writeObject(m);
-            //socket.shutdownOutput();
-            //socket.shutdownInput();
-        //}
-        //if(temp.equals("1")){
-            //result = false;
-        //}
-
         User user=new User(Integer.parseInt(usrName),passWord);
         user.setOperation("login");
 
         try {
-
+            //1.创建客户端Socket，指定服务器地址和端口
+            Socket socket = new Socket("192.168.3.19", 12345);
             ObjectOutputStream oos=new ObjectOutputStream(socket.getOutputStream());
             oos.writeObject(user);
             ObjectInputStream ois=new ObjectInputStream(socket.getInputStream());
@@ -151,6 +106,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 result=true;
                 try {
                     //发送一个要求返回在线好友的请求的Message
+                    oos=new ObjectOutputStream(socket.getOutputStream());//这里需要重新new一个输出流，否则服务端会报错
                     JiChatMsg m=new JiChatMsg();
                     m.setType(JiChatMsgType.GET_ONLINE_FRIENDS);
                     m.setSender(user.getAccount());
@@ -158,6 +114,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                this.finish();
                 return result;
             }else if(jcs.getType().equals(JiChatMsgType.FAIL)){
                 result=false;
@@ -180,6 +137,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if(msg.what == 0x123)
             {
                 Intent intent = new Intent(MainActivity.this,JichatMainActivity.class);
+                intent.putExtra("username",Integer.parseInt(usrName));
+                Log.e("Jichat1",usrName+"usrName");
                 MainActivity.this.startActivity(intent);
             }
         }
