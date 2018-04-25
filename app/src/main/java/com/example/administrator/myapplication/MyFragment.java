@@ -1,27 +1,29 @@
-package zcom.myview.jison.tabdemo;
+package com.example.administrator.myapplication;
 
 import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
+
+import java.util.LinkedList;
 
 /**
  * Created by Administrator on 2018/4/24 0024.
  */
 
-public class MyFragment extends Fragment implements View.OnClickListener{
+public class MyFragment extends Fragment{
 
-    private Context mContext;
-    private Button btn_one;
-    private Button btn_two;
-    private Button btn_three;
-    private Button btn_four;
+    private ListView lv;
+    private FriendsAdapter friendsAdapter = null;
 
     public MyFragment() {
 
@@ -30,41 +32,24 @@ public class MyFragment extends Fragment implements View.OnClickListener{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fg_my,container,false);
-        //UI Object
-        btn_one = (Button) view.findViewById(R.id.btn_one);
-        btn_two = (Button) view.findViewById(R.id.btn_two);
-        btn_three = (Button) view.findViewById(R.id.btn_three);
-        btn_four = (Button) view.findViewById(R.id.btn_four);
-        //Bind Event
-        btn_one.setOnClickListener(this);
-        btn_two.setOnClickListener(this);
-        btn_three.setOnClickListener(this);
-        btn_four.setOnClickListener(this);
-        return view;
-    }
+        lv = view.findViewById(R.id.lv_friend);
+        friendsAdapter = new FriendsAdapter(this.getActivity(),JichatMainActivity.data);
+        lv.setAdapter(friendsAdapter);
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Log.e("Jichat1","click item performed");
+                Integer userAccount = getActivity().getIntent().getIntExtra("username",0);
+                Integer account = (Integer) lv.getItemAtPosition(i);
+                Intent intent = new Intent(getActivity(),ChatActivity.class);
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.btn_one:
-                TextView tab_menu_channel_num = (TextView) getActivity ().findViewById(R.id.tab_menu_channel_num);
-                tab_menu_channel_num.setText("11");
-                tab_menu_channel_num.setVisibility(View.VISIBLE);
-                break;
-            case R.id.btn_two:
-                TextView tab_menu_message_num = (TextView) getActivity ().findViewById(R.id.tab_menu_message_num);
-                tab_menu_message_num.setText("20");
-                tab_menu_message_num.setVisibility(View.VISIBLE);
-                break;
-            case R.id.btn_three:
-                TextView tab_menu_better_num = (TextView) getActivity ().findViewById(R.id.tab_menu_better_num);
-                tab_menu_better_num.setText("99+");
-                tab_menu_better_num.setVisibility(View.VISIBLE);
-                break;
-            case R.id.btn_four:
-                ImageView tab_menu_setting_partner = (ImageView) getActivity ().findViewById(R.id.tab_menu_setting_partner);
-                tab_menu_setting_partner.setVisibility(View.VISIBLE);
-                break;
-        }
+                Log.e("Jichat1",account+"");
+                Log.e("Jichat1",userAccount+"");
+                intent.putExtra("account",account);
+                intent.putExtra("userAccount",userAccount);
+                startActivity(intent);
+            }
+        });
+        return view;
     }
 }
