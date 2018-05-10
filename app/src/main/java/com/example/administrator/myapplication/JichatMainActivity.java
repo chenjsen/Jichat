@@ -18,10 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class JichatMainActivity extends AppCompatActivity implements View.OnClickListener{
-    //private ListView lv;
     public static LinkedList<Integer> data = new LinkedList<>();
-    //private Context context = null;
-    //private FriendsAdapter friendsAdapter = null;
     private LinearLayout ly_tab_menu_channel;
     private TextView tab_menu_channel;
     private TextView tab_menu_channel_num;
@@ -35,40 +32,21 @@ public class JichatMainActivity extends AppCompatActivity implements View.OnClic
     private TextView tab_menu_setting;
     private ImageView tab_menu_setting_partner;
     private FragmentManager fManager;
-    private FragmentTransaction fTransaction;
     private MyFragment fg1;
+    private RecentChatFragment rcf;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        data.add(new Integer(111));
-//        data.add(new Integer(222));
-//        data.add(new Integer(333));
         setContentView(R.layout.activity_tabmain);
         bindViews();
         ly_tab_menu_channel.performClick();
-        fg1 = new MyFragment();
-        fManager = getFragmentManager();
-        fTransaction = fManager.beginTransaction();
-        fTransaction.add(R.id.ly_content, fg1).commit();
-//        context = JichatMainActivity.this;
-//        lv = findViewById(R.id.lv_friend);
-//        friendsAdapter = new FriendsAdapter(context,data);
-//        lv.setAdapter(friendsAdapter);
-//        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-//                Integer userAccount = getIntent().getIntExtra("username",0);
-//                Integer account = (Integer) lv.getItemAtPosition(i);
-//                Intent intent = new Intent(JichatMainActivity.this,ChatActivity.class);
-//
-//                Log.e("Jichat1",account+"");
-//                Log.e("Jichat1",userAccount+"");
-//                intent.putExtra("account",account);
-//                intent.putExtra("userAccount",userAccount);
-//                startActivity(intent);
-//            }
-//        });
+        tab_menu_channel.setSelected(true);
+//        fg1 = new MyFragment();
+//        fManager = getFragmentManager();
+//        FragmentTransaction fTransaction = fManager.beginTransaction();
+//        fTransaction.add(R.id.ly_content, fg1).commit();
+
     }
 
     private void bindViews() {
@@ -96,11 +74,29 @@ public class JichatMainActivity extends AppCompatActivity implements View.OnClic
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.ly_tab_menu_channel:
+                fManager = getFragmentManager();
+                FragmentTransaction fTransaction1 = fManager.beginTransaction();
+                if(fg1 == null){
+                    fg1 = new MyFragment();
+                    fTransaction1.add(R.id.ly_content, fg1);
+                }
+
+                hideFragment(fTransaction1);
+                fTransaction1.show(fg1);
+                fTransaction1.commit();
                 setSelected();
                 tab_menu_channel.setSelected(true);
                 tab_menu_channel_num.setVisibility(View.INVISIBLE);
                 break;
             case R.id.ly_tab_menu_message:
+                FragmentTransaction fTransaction = fManager.beginTransaction();
+                if(rcf == null){
+                    rcf = new RecentChatFragment();
+                    fTransaction.add(R.id.ly_content, rcf);
+                }
+                hideFragment(fTransaction);
+                fTransaction.show(rcf);
+                fTransaction.commit();
                 setSelected();
                 tab_menu_message.setSelected(true);
                 tab_menu_message_num.setVisibility(View.INVISIBLE);
@@ -124,5 +120,14 @@ public class JichatMainActivity extends AppCompatActivity implements View.OnClic
         tab_menu_message.setSelected(false);
         tab_menu_better.setSelected(false);
         tab_menu_setting.setSelected(false);
+    }
+
+    private void hideFragment(FragmentTransaction fTransaction){
+        if(fg1 != null){
+            fTransaction.hide(fg1);
+        }
+        if(rcf != null){
+            fTransaction.hide(rcf);
+        }
     }
 }

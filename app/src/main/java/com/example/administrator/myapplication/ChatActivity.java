@@ -1,9 +1,13 @@
 package com.example.administrator.myapplication;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -28,7 +32,7 @@ public class ChatActivity extends AppCompatActivity {
     String   content;
     int      userAccount;
     int      chatAccount;
-    public List<ChatEntity> ChatData = new ArrayList<ChatEntity>() ;
+    public static List<ChatEntity> ChatData = new ArrayList<ChatEntity>() ;
     MyBroadcastReceiver myBroadcastReceiver;
     LocalBroadcastManager lbm;
 
@@ -97,7 +101,10 @@ public class ChatActivity extends AppCompatActivity {
             //更新聊天内容
             Toast.makeText(context, "收到["+mes[0]+"]的消息："+mes[1], Toast.LENGTH_SHORT).show();
             Log.e("Jichat2", "94"+mes.toString());
+            //abortBroadcast();
             updateChatView(new ChatEntity(Integer.parseInt(mes[0]),mes[1],true));
+            Intent it = new Intent(context, ChatActivity.class);
+            PendingIntent pit = PendingIntent.getActivity(context, 0, it, 0);
         }
     }
 }

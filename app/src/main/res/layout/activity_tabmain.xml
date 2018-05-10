@@ -137,7 +137,7 @@
                     android:id="@+id/tab_menu_setting"
                     style="@style/tab_menu_text"
                     android:drawableTop="@drawable/tab_menu_setting"
-                    android:text="@string/tab_menu_alert" />
+                    android:text="@string/tab_menu_setting" />
 
                 <ImageView
                     android:id="@+id/tab_menu_setting_partner"

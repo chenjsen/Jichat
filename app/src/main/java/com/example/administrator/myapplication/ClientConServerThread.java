@@ -49,6 +49,7 @@ public class ClientConServerThread extends Thread {
                 }else if(jcm.getType().equals(JiChatMsgType.RET_ONLINE_FRIENDS)){//如果是好友列表
                     //更新好友，群
                     String s[] = jcm.getContent().split(" ");
+                    JichatMainActivity.data.clear();
                     for(String temp :s){
                         Log.e("Jichat",temp);
                         JichatMainActivity.data.add(Integer.parseInt(temp));
