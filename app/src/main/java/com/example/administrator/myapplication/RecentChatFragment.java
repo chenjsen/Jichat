@@ -2,18 +2,19 @@ package com.example.administrator.myapplication;
 
 import android.app.Fragment;
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.AdapterView;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -33,6 +34,9 @@ public class RecentChatFragment extends Fragment {
     String[] mes;
     MsgBroadcastReceiver br;
     RecentAdapter recentAdapter;
+    ChatLogDBOpenHelper chatLogDBOpenHelper;
+    Integer userAccount;
+    SQLiteDatabase db;
 
     public RecentChatFragment() {
 
@@ -48,14 +52,20 @@ public class RecentChatFragment extends Fragment {
         lbm = LocalBroadcastManager.getInstance(getActivity());
         br=new MsgBroadcastReceiver();
         lbm.registerReceiver(br, myIntentFilter);
+        chatLogDBOpenHelper = new ChatLogDBOpenHelper(getActivity(),"chat_log.db",null,1);
+        db = chatLogDBOpenHelper.getReadableDatabase();
 
+        chatEntityList.clear();
+        getData(111);
+        getData(222);
+        getData(333);
         listView =  view.findViewById(R.id.lv_recent);
         recentAdapter = new RecentAdapter(this.getActivity(), chatEntityList);
         listView.setAdapter(recentAdapter);
+        userAccount = getActivity().getIntent().getIntExtra("username",0);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
             public void onItemClick(AdapterView<?> arg0, View arg1, int position,
                                     long arg3) {
-                Integer userAccount = getActivity().getIntent().getIntExtra("username",0);
                 int account=Integer.parseInt(mes[0]);
                 chatEntityList.get(position).setRead(true);
                 recentAdapter.notifyDataSetChanged();
@@ -94,8 +104,30 @@ public class RecentChatFragment extends Fragment {
             chatEntityList.add(new RecentEntity(Integer.parseInt(mes[0]), mes[1], false));
             recentAdapter.notifyDataSetChanged();
             Toast.makeText(context, mes[0] + "： " + mes[1], Toast.LENGTH_SHORT).show();
-
+            SQLiteDatabase db = chatLogDBOpenHelper.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put("userAccount",userAccount+"");
+            values.put("account",mes[0]);
+            values.put("content",mes[1]);
+            values.put("isLeft",0);
+            //db.insert("chat_log"+mes[0],null,values);
+            db.close();
         }
+    }
+
+    public void getData(Integer i) {
+        if(i == userAccount )
+        {
+            return;
+        }
+        Cursor cursor = db.query("chat_log"+i, null, null, null, null, null, null);
+        if(cursor.moveToLast()){
+            int account = Integer.parseInt(cursor.getString(cursor.getColumnIndex("account")));
+            String content = cursor.getString(cursor.getColumnIndex("content"));
+            RecentEntity recentEntity = new RecentEntity(account,content,true);
+            chatEntityList.add(recentEntity);
+        }
+        cursor.close();
     }
 
 }

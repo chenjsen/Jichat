@@ -25,6 +25,18 @@
             android:launchMode="singleTask">
         </activity>
 
+        <!--<receiver android:name=".ChatActivity$MyBroadcastReceiver">-->
+            <!--<intent-filter android:priority="1000">-->
+                <!--<action android:name="com.example.administrator.mes"></action>-->
+            <!--</intent-filter>-->
+        <!--</receiver>-->
+
+        <!--<receiver android:name=".RecentChatFragment$MsgBroadcastReceiver">-->
+            <!--<intent-filter android:priority="0">-->
+                <!--<action android:name="com.example.administrator.mes"></action>-->
+            <!--</intent-filter>-->
+        <!--</receiver>-->
+
 
     </application>
 

@@ -4,9 +4,12 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
@@ -35,6 +38,7 @@ public class ChatActivity extends AppCompatActivity {
     public static List<ChatEntity> ChatData = new ArrayList<ChatEntity>() ;
     MyBroadcastReceiver myBroadcastReceiver;
     LocalBroadcastManager lbm;
+    ChatLogDBOpenHelper chatLogDBOpenHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,8 +49,21 @@ public class ChatActivity extends AppCompatActivity {
         chatAccount = getIntent().getIntExtra("account",0);
         tv_title.setText("chat with " + chatAccount);
         lbm = LocalBroadcastManager.getInstance(this);
-
-
+        chatLogDBOpenHelper = new ChatLogDBOpenHelper(this,"chat_log.db",null,1);
+        SQLiteDatabase db = chatLogDBOpenHelper.getReadableDatabase();
+        Cursor cursor = db.query("chat_log"+chatAccount, null, null, null, null, null, null);
+        ChatData.clear();
+        if(cursor.moveToFirst()){
+            do{
+                int account = Integer.parseInt(cursor.getString(cursor.getColumnIndex("account")));
+                String content = cursor.getString(cursor.getColumnIndex("content"));
+                Boolean isLeft = (cursor.getInt(cursor.getColumnIndex("isLeft")) == 0) ?true:false;
+                ChatEntity chatEntity = new ChatEntity(account,content,isLeft);
+                ChatData.add(chatEntity);
+            }while(cursor.moveToNext());
+            lv_chat.setAdapter(new ChatAdapter(this,ChatData));
+        }
+        cursor.close();
         bt_send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -91,6 +108,14 @@ public class ChatActivity extends AppCompatActivity {
     void updateChatView(ChatEntity chatEntity){
         ChatData.add(chatEntity);
         lv_chat.setAdapter(new ChatAdapter(this,ChatData));
+        SQLiteDatabase db = chatLogDBOpenHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("userAccount",userAccount+"");
+        values.put("account",chatEntity.getAccount()+"");
+        values.put("content",chatEntity.getContent());
+        values.put("isLeft",(chatEntity.isLeft() ? 0 :1));
+        db.insert("chat_log"+chatAccount,null,values);
+        db.close();
     }
 
     //广播接收器
@@ -103,8 +128,6 @@ public class ChatActivity extends AppCompatActivity {
             Log.e("Jichat2", "94"+mes.toString());
             //abortBroadcast();
             updateChatView(new ChatEntity(Integer.parseInt(mes[0]),mes[1],true));
-            Intent it = new Intent(context, ChatActivity.class);
-            PendingIntent pit = PendingIntent.getActivity(context, 0, it, 0);
         }
     }
 }

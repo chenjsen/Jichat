@@ -42,10 +42,6 @@ public class JichatMainActivity extends AppCompatActivity implements View.OnClic
         bindViews();
         ly_tab_menu_channel.performClick();
         tab_menu_channel.setSelected(true);
-//        fg1 = new MyFragment();
-//        fManager = getFragmentManager();
-//        FragmentTransaction fTransaction = fManager.beginTransaction();
-//        fTransaction.add(R.id.ly_content, fg1).commit();
 
     }
 
