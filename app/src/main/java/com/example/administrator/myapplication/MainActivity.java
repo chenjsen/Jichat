@@ -1,6 +1,7 @@
 package com.example.administrator.myapplication;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
 import android.os.StrictMode;
@@ -32,8 +33,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
                 .detectDiskReads().detectDiskWrites().detectNetwork()
                 .penaltyLog().build());
-        setContentView(R.layout.activity_main);
-        bindView();
+
+        SharedPreferences sp = getPreferences(MODE_PRIVATE);
+        Boolean isLogged = sp.getBoolean("isLogged", false);
+        String account   = sp.getString("account", "");
+        Log.e("isLogged",isLogged+"isLogged");
+
+        //如果已经登录发起好友列表请求并直接跳转到主界面
+        if(isLogged){
+            ClientConServerThread ccst = ManageClientConServer.getClientConServerThread(Integer.parseInt(account));
+            Socket socket = ccst.getS();
+            try {
+                //发送一个要求返回在线好友的请求的Message
+                ObjectOutputStream oos=new ObjectOutputStream(socket.getOutputStream());//这里需要重新new一个输出流，否则服务端会报错
+                JiChatMsg m=new JiChatMsg();
+                m.setType(JiChatMsgType.GET_ONLINE_FRIENDS);
+                m.setSender(Integer.parseInt(account));
+                oos.writeObject(m);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            this.finish();
+        }else{
+            setContentView(R.layout.activity_main);
+            bindView();
+        }
+
+
     }
 
     public void bindView(){
@@ -96,6 +122,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             ObjectInputStream ois=new ObjectInputStream(socket.getInputStream());
             JiChatMsg jcs=(JiChatMsg)ois.readObject();
             if(jcs.getType().equals(JiChatMsgType.SUCCESS)){
+                //保存是否已经登录
+                SharedPreferences sp = getPreferences(MODE_PRIVATE);
+                SharedPreferences.Editor edit = sp.edit();
+                edit.putBoolean("isLogged", true);
+                edit.putString("account", usrName);
+                edit.apply();
                 //个人信息
                 //创建一个该账号和服务器保持连接的线程
                 ClientConServerThread ccst=new ClientConServerThread(MainActivity.this,socket,myHandler);

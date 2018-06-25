@@ -1,8 +1,5 @@
 package com.example.administrator.myapplication;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -10,7 +7,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Build;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -51,8 +47,12 @@ public class ChatActivity extends AppCompatActivity {
         lbm = LocalBroadcastManager.getInstance(this);
         chatLogDBOpenHelper = new ChatLogDBOpenHelper(this,"chat_log.db",null,1);
         SQLiteDatabase db = chatLogDBOpenHelper.getReadableDatabase();
-        Cursor cursor = db.query("chat_log"+chatAccount, null, null, null, null, null, null);
+        Cursor cursor = db.query("chat_log"+chatAccount, null, "userAccount = " + userAccount, null, null, null, null);
         ChatData.clear();
+        Intent intent = new Intent();
+        intent.setAction("com.jison.example.service");
+        intent.setPackage(this.getPackageName());
+        stopService(intent);
         if(cursor.moveToFirst()){
             do{
                 int account = Integer.parseInt(cursor.getString(cursor.getColumnIndex("account")));
@@ -95,6 +95,10 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     public void onDestroy(){
         lbm.unregisterReceiver(myBroadcastReceiver);
+        Intent intent = new Intent();
+        intent.setAction("com.jison.example.service");
+        intent.setPackage(this.getPackageName());
+        startService(intent);
         super.onDestroy();
     }
 
@@ -105,7 +109,7 @@ public class ChatActivity extends AppCompatActivity {
         lv_chat = findViewById(R.id.lv_chat);
     }
 
-    void updateChatView(ChatEntity chatEntity){
+    public void updateChatView(ChatEntity chatEntity){
         ChatData.add(chatEntity);
         lv_chat.setAdapter(new ChatAdapter(this,ChatData));
         SQLiteDatabase db = chatLogDBOpenHelper.getWritableDatabase();

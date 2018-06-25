@@ -42,7 +42,10 @@ public class JichatMainActivity extends AppCompatActivity implements View.OnClic
         bindViews();
         ly_tab_menu_channel.performClick();
         tab_menu_channel.setSelected(true);
-
+        Intent intent = new Intent();
+        intent.setAction("com.jison.example.service");
+        intent.setPackage(this.getPackageName());
+        startService(intent);
     }
 
     private void bindViews() {

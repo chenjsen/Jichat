@@ -42,10 +42,10 @@ public class ClientConServerThread extends Thread {
                     Intent intent = new Intent("com.example.administrator.mes");
                     String[] message=new String[]{
                             jcm.getSender()+"",
-                            jcm.getContent(),};
-                    Log.e("Jichat2", "44"+message.toString());
+                            jcm.getContent()+"",jcm.getReceiver()+""};
                     intent.putExtra("message", message);
                     lbm.sendBroadcast(intent);
+                    Log.e("Jichat32", message[0]+":"+message[1]);
                 }else if(jcm.getType().equals(JiChatMsgType.RET_ONLINE_FRIENDS)){//如果是好友列表
                     //更新好友，群
                     String s[] = jcm.getContent().split(" ");

@@ -25,11 +25,11 @@
             android:launchMode="singleTask">
         </activity>
 
-        <!--<receiver android:name=".ChatActivity$MyBroadcastReceiver">-->
-            <!--<intent-filter android:priority="1000">-->
-                <!--<action android:name="com.example.administrator.mes"></action>-->
-            <!--</intent-filter>-->
-        <!--</receiver>-->
+        <service android:name=".RcvMsgService">
+            <intent-filter>
+                <action android:name="com.jison.example.service"></action>
+            </intent-filter>
+        </service>
 
         <!--<receiver android:name=".RecentChatFragment$MsgBroadcastReceiver">-->
             <!--<intent-filter android:priority="0">-->

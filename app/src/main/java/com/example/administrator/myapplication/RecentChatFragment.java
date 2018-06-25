@@ -66,7 +66,7 @@ public class RecentChatFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
             public void onItemClick(AdapterView<?> arg0, View arg1, int position,
                                     long arg3) {
-                int account=Integer.parseInt(mes[0]);
+                int account=chatEntityList.get(position).getAccount();
                 chatEntityList.get(position).setRead(true);
                 recentAdapter.notifyDataSetChanged();
                 //打开聊天页面
@@ -104,13 +104,22 @@ public class RecentChatFragment extends Fragment {
             chatEntityList.add(new RecentEntity(Integer.parseInt(mes[0]), mes[1], false));
             recentAdapter.notifyDataSetChanged();
             Toast.makeText(context, mes[0] + "： " + mes[1], Toast.LENGTH_SHORT).show();
-            SQLiteDatabase db = chatLogDBOpenHelper.getWritableDatabase();
+
+            SQLiteDatabase db = chatLogDBOpenHelper.getReadableDatabase();
+            Cursor cursor = db.query("chat_log"+mes[0], null, "userAccount = " + userAccount + " and account = " + mes[0] + " and content = '" + mes[1]+"'", null, null, null, null);
+            if(cursor.moveToFirst()){
+                db.close();
+                return;
+            }
+
+
+            db = chatLogDBOpenHelper.getWritableDatabase();
             ContentValues values = new ContentValues();
             values.put("userAccount",userAccount+"");
             values.put("account",mes[0]);
             values.put("content",mes[1]);
             values.put("isLeft",0);
-            //db.insert("chat_log"+mes[0],null,values);
+            db.insert("chat_log"+mes[0],null,values);
             db.close();
         }
     }
