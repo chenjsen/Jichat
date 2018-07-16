@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="60dp"
+    android:layout_marginTop="5dp">
+    <TextView
+        android:id="@+id/account_audio_left"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:text="222:"/>
+
+    <LinearLayout
+        android:id="@+id/id_recorder_length"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@id/account_audio_left"
+        android:background="@drawable/chat_left"
+        >
+
+        <View
+            android:id="@+id/id_recorder_anim"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginLeft="7dp"
+            android:layout_gravity="center_vertical|left"
+            android:background="@drawable/audio_left"
+            />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/id_recorder_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/id_recorder_length"
+        android:layout_marginRight="3dp"
+        android:textColor="#ff777777"
+        />
+
+</RelativeLayout>

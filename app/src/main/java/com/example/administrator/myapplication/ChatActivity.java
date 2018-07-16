@@ -7,13 +7,17 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.drawable.AnimationDrawable;
+import android.media.MediaPlayer;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,8 +33,12 @@ public class ChatActivity extends AppCompatActivity {
     Button   bt_send;
     ListView lv_chat;
     String   content;
+    ImageButton ibt_audio;
+    AudioRecorderButton audioRecorderButton;
     int      userAccount;
     int      chatAccount;
+    boolean  isAudio = false;
+    private View mAnimView;
     public static List<ChatEntity> ChatData = new ArrayList<ChatEntity>() ;
     MyBroadcastReceiver myBroadcastReceiver;
     LocalBroadcastManager lbm;
@@ -58,7 +66,7 @@ public class ChatActivity extends AppCompatActivity {
                 int account = Integer.parseInt(cursor.getString(cursor.getColumnIndex("account")));
                 String content = cursor.getString(cursor.getColumnIndex("content"));
                 Boolean isLeft = (cursor.getInt(cursor.getColumnIndex("isLeft")) == 0) ?true:false;
-                ChatEntity chatEntity = new ChatEntity(account,content,isLeft);
+                ChatEntity chatEntity = new ChatEntity(account,content,isLeft,false,0);
                 ChatData.add(chatEntity);
             }while(cursor.moveToNext());
             lv_chat.setAdapter(new ChatAdapter(this,ChatData));
@@ -69,7 +77,7 @@ public class ChatActivity extends AppCompatActivity {
             public void onClick(View view) {
                 content = et_chat.getText().toString();
                 et_chat.setText("");
-                updateChatView(new ChatEntity(userAccount,content,false));
+                updateChatView(new ChatEntity(userAccount,content,false,false,0));
 
                 //向服务端发送数据
                 try{
@@ -82,6 +90,33 @@ public class ChatActivity extends AppCompatActivity {
                     oos.writeObject(jcm);
                 }catch (Exception e){
                     e.printStackTrace();
+                }
+            }
+        });
+
+        lv_chat.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                ChatEntity chatEntity = ChatData.get(i);
+                if(chatEntity.isAudio()){
+                    //如果第一个动画正在运行， 停止第一个播放其他的
+                    if (mAnimView != null) {
+                        mAnimView.setBackgroundResource(R.drawable.adj);
+                        mAnimView = null;
+                    }
+                    //播放动画
+                    mAnimView = view.findViewById(R.id.id_recorder_anim);
+                    mAnimView.setBackgroundResource(R.drawable.play_anim);
+                    AnimationDrawable animation = (AnimationDrawable) mAnimView.getBackground();
+                    animation.start();
+
+                    //播放音频  完成后改回原来的background
+                    MediaManager.playSound(chatEntity.getContent(), new MediaPlayer.OnCompletionListener() {
+                        @Override
+                        public void onCompletion(MediaPlayer mp) {
+                            mAnimView.setBackgroundResource(R.drawable.adj);
+                        }
+                    });
                 }
             }
         });
@@ -107,6 +142,33 @@ public class ChatActivity extends AppCompatActivity {
         et_chat = findViewById(R.id.et_chat);
         bt_send = findViewById(R.id.bt_send);
         lv_chat = findViewById(R.id.lv_chat);
+        ibt_audio = findViewById(R.id.ibt_audio);
+        audioRecorderButton = findViewById(R.id.id_recorder_button);
+
+        ibt_audio.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                isAudio = !isAudio;
+                if(isAudio){
+                    et_chat.setVisibility(View.INVISIBLE);
+                    audioRecorderButton.setVisibility(View.VISIBLE);
+                } else {
+                    et_chat.setVisibility(View.VISIBLE);
+                    audioRecorderButton.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
+
+        audioRecorderButton.setAudioFinishRecorderListener(new AudioRecorderButton.AudioFinishRecorderListener() {
+            @Override
+            public void onFinish(float seconds, String filePath) {
+                //每完成一次录音
+                ChatEntity chatEntity = new ChatEntity(userAccount,filePath,false,true,seconds);
+                ChatData.add(chatEntity);
+                //更新adapter
+                lv_chat.setAdapter(new ChatAdapter(ChatActivity.this,ChatData));
+            }
+        });
     }
 
     public void updateChatView(ChatEntity chatEntity){
@@ -131,7 +193,8 @@ public class ChatActivity extends AppCompatActivity {
             Toast.makeText(context, "收到["+mes[0]+"]的消息："+mes[1], Toast.LENGTH_SHORT).show();
             Log.e("Jichat2", "94"+mes.toString());
             //abortBroadcast();
-            updateChatView(new ChatEntity(Integer.parseInt(mes[0]),mes[1],true));
+            updateChatView(new ChatEntity(Integer.parseInt(mes[0]),mes[1],true,false,0));
         }
     }
+
 }

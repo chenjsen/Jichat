@@ -34,18 +34,45 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true">
 
+        <ImageButton
+            android:id="@+id/ibt_audio"
+            android:layout_width="40dip"
+            android:layout_height="40dip"
+            android:background="@drawable/audio"
+            android:layout_marginLeft="5dp"
+            android:layout_alignParentLeft="true"/>
+
         <EditText
             android:id="@+id/et_chat"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_marginLeft="10dp"
+            android:layout_toLeftOf="@id/bt_send"
+            android:layout_toRightOf="@id/ibt_audio"
+            android:layout_marginLeft="45dp"
             android:selectAllOnFocus="true" />
+        <com.example.administrator.myapplication.AudioRecorderButton
+            android:id="@+id/id_recorder_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/str_recorder_normal"
+            android:textColor="#727272"
+            android:background="@drawable/btn_recorder_normal"
+            android:visibility="invisible"
+            android:layout_toLeftOf="@id/bt_send"
+            android:layout_toRightOf="@id/ibt_audio"
+            >
+        </com.example.administrator.myapplication.AudioRecorderButton>
+
         <Button
             android:id="@+id/bt_send"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
             android:text="send" />
+
     </RelativeLayout>
+
 </RelativeLayout>
