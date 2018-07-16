@@ -66,7 +66,9 @@ public class ChatActivity extends AppCompatActivity {
                 int account = Integer.parseInt(cursor.getString(cursor.getColumnIndex("account")));
                 String content = cursor.getString(cursor.getColumnIndex("content"));
                 Boolean isLeft = (cursor.getInt(cursor.getColumnIndex("isLeft")) == 0) ?true:false;
-                ChatEntity chatEntity = new ChatEntity(account,content,isLeft,false,0);
+                Boolean isAudio = (cursor.getInt(cursor.getColumnIndex("isAudio")) == 0) ?true:false;
+                float time = cursor.getFloat(cursor.getColumnIndex("time"));
+                ChatEntity chatEntity = new ChatEntity(account,content,isLeft,isAudio,time);
                 ChatData.add(chatEntity);
             }while(cursor.moveToNext());
             lv_chat.setAdapter(new ChatAdapter(this,ChatData));
@@ -167,6 +169,18 @@ public class ChatActivity extends AppCompatActivity {
                 ChatData.add(chatEntity);
                 //更新adapter
                 lv_chat.setAdapter(new ChatAdapter(ChatActivity.this,ChatData));
+
+                //语音信息也保存到数据库中
+                SQLiteDatabase db = chatLogDBOpenHelper.getWritableDatabase();
+                ContentValues values = new ContentValues();
+                values.put("userAccount",userAccount+"");
+                values.put("account",chatEntity.getAccount()+"");
+                values.put("content",chatEntity.getContent());
+                values.put("isLeft",(chatEntity.isLeft() ? 0 :1));
+                values.put("isAudio",(chatEntity.isAudio() ? 0 :1));
+                values.put("time",chatEntity.getTime());
+                db.insert("chat_log"+chatAccount,null,values);
+                db.close();
             }
         });
     }
@@ -180,6 +194,7 @@ public class ChatActivity extends AppCompatActivity {
         values.put("account",chatEntity.getAccount()+"");
         values.put("content",chatEntity.getContent());
         values.put("isLeft",(chatEntity.isLeft() ? 0 :1));
+        values.put("isAudio",(chatEntity.isAudio() ? 0 :1));
         db.insert("chat_log"+chatAccount,null,values);
         db.close();
     }

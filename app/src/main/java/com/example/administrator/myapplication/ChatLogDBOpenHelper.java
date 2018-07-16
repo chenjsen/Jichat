@@ -16,9 +16,9 @@ public class ChatLogDBOpenHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        sqLiteDatabase.execSQL("CREATE TABLE chat_log111(id INTEGER PRIMARY KEY AUTOINCREMENT,userAccount varchar(20),account varchar(20),content text,isLeft INTEGER)");
-        sqLiteDatabase.execSQL("CREATE TABLE chat_log222(id INTEGER PRIMARY KEY AUTOINCREMENT,userAccount varchar(20),account varchar(20),content text,isLeft INTEGER)");
-        sqLiteDatabase.execSQL("CREATE TABLE chat_log333(id INTEGER PRIMARY KEY AUTOINCREMENT,userAccount varchar(20),account varchar(20),content text,isLeft INTEGER)");
+        sqLiteDatabase.execSQL("CREATE TABLE chat_log111(id INTEGER PRIMARY KEY AUTOINCREMENT,userAccount varchar(20),account varchar(20),content text,isLeft INTEGER,isAudio INTEGER,time FLOAT)");
+        sqLiteDatabase.execSQL("CREATE TABLE chat_log222(id INTEGER PRIMARY KEY AUTOINCREMENT,userAccount varchar(20),account varchar(20),content text,isLeft INTEGER,isAudio INTEGER,time FLOAT)");
+        sqLiteDatabase.execSQL("CREATE TABLE chat_log333(id INTEGER PRIMARY KEY AUTOINCREMENT,userAccount varchar(20),account varchar(20),content text,isLeft INTEGER,isAudio INTEGER,time FLOAT)");
     }
 
     @Override
